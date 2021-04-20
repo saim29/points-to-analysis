@@ -8,6 +8,7 @@
 #include <stack>
 #include <vector>
 
+#include  "llvm/IR/Module.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/DenseMap.h"
