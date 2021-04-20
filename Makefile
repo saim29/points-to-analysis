@@ -1,14 +1,12 @@
-INC=-I/usr/local/include/
-all: andersen.so
+all: andersen tests
 
-CXXFLAGS = -rdynamic $(shell llvm-config --cxxflags) $(INC) -g -O0 -fPIC
+andersen:
+	@echo "Building Pass ..."
+	make -C bld
 
-andersen.o: andersen.cpp andersen.h
-
-%.so: %.o 
-	$(CXX) -dylib -shared $^ -o $@
+tests:
 
 clean:
-	rm -f *.o *.so
+	make clean -C bld
 
-.PHONY: clean all
+.PHONY: clean tests andersen
