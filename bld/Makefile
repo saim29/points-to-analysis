@@ -4,9 +4,10 @@ all: andersen.so
 CXXFLAGS = -rdynamic $(shell llvm-config --cxxflags) $(INC) -g -O0 -fPIC
 VPATH = ../src ../include
 
-andersen.o: andersen.cpp andersen.h
+constraintGraph.o: constraintGraph.cpp constraintGraph.h
+constraintCollector.o: constraintCollector.cpp constraintCollector.h
 
-%.so: %.o 
+%.so: %.o constraintGraph.o 
 	$(CXX) -dylib -shared $^ -o $@
 
 clean:
