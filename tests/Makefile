@@ -1,8 +1,10 @@
-all: basic.ll
+all: basic.bc basic.ll
 
-%.ll : %.c
-	clang -Xclang -disable-O0-optnone -O0 -emit-llvm -S -c $<
+%.bc : %.c
+	clang -Xclang -disable-O0-optnone -O0 -emit-llvm -c $<
 
+%.ll : %.bc
+	llvm-dis $<
 clean: 
 	rm -f *.ll *.bc
 
