@@ -28,18 +28,18 @@ namespace llvm {
         return ref;
     }
 
-    void constraintGraph::addEdge(Node *to, Node *from) {
+    void constraintGraph::addEdge(Node *src, Node *dst) {
 
-        cGraph[to->ref]->children.insert(from);
+        cGraph[src->ref]->children.insert(dst);
 
     }
 
-    bool constraintGraph::isPath(Node* to, Node* from) {
+    bool constraintGraph::isPath(Node* src, Node* dst) {
 
         std::queue<Node*> node_queue;
         std::set<Node*> visited;
 
-        node_queue.push(from);
+        node_queue.push(src);
 
         while (!node_queue.empty()) {
 
@@ -56,7 +56,7 @@ namespace llvm {
 
                 }
 
-                if (child == to) {
+                if (child == dst) {
 
                     return true;
 
