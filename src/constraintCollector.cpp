@@ -10,7 +10,14 @@ namespace llvm {
     }
 
     bool constraintCollector::runOnModule(Module &M) { 
-        
+
+        // call helpler functions to collect constraints
+
+        globalConstraintCollector(M);
+
+        for (Function &F : M)
+            functionConstraintCollector(F);
+
         return false;
     }
 

@@ -55,7 +55,7 @@ namespace llvm {
             void globalConstraintCollector(Module &M);
             void functionConstraintCollector(Function &F);
 
-            bool hasPtrArgs(Function &F) 
+            bool hasPtrArgs(Function &F);
 
     };
 }
