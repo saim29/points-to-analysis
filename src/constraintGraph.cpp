@@ -17,7 +17,10 @@ namespace llvm {
 
     Node* constraintGraph::getNode(Value *ref) {
 
-        return cGraph[ref];
+        if (cGraph.find(ref) != cGraph.end())
+            return cGraph[ref];
+        
+        return NULL;
 
     }
 

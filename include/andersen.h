@@ -41,7 +41,7 @@ namespace llvm {
 
       // method to initialize initial constraint graph
       void initConstraintGraph(DenseMap<Function*, cSet> base, DenseMap<Function*, cSet> simple,
-          DenseSet<GlobalValue*> global);
+          DenseMap<Function*, cSet> loads, DenseSet<GlobalValue*> global);
 
       // an iterative solver for complex constraints
       void solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2);

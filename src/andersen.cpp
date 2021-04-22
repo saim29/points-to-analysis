@@ -14,13 +14,13 @@ namespace llvm {
         constraintCollector &constraints = getAnalysis<constraintCollector>();
 
         // populate graph
-        initConstraintGraph(constraints.base, constraints.simple, constraints.globalConstraints);
+        initConstraintGraph(constraints.base, constraints.simple, constraints.complex1, constraints.globalConstraints);
 
         return false;
     }
 
-    void andersen::initConstraintGraph(DenseMap<Function*, cSet> base, DenseMap<Function*, cSet> simple,
-        DenseSet<GlobalValue*> global) {
+    void andersen::initConstraintGraph(DenseMap<Function*, cSet> base, DenseMap<Function*, cSet> simple, 
+        DenseMap<Function*, cSet> loads, DenseSet<GlobalValue*> global) {
 
         // add constraints for all global placeholders e.g functions and global variables
         for(GlobalValue* constraint : global) {
@@ -63,6 +63,17 @@ namespace llvm {
                     points_to_graph.addNode(alloc, NodeType::PTR);
                 else 
                     points_to_graph.addNode(alloc, NodeType::MEM);
+
+            }
+
+        }
+
+        // loads result in the creation of new nodes since they are assigned to new virtual registers
+        for(auto func : loads) {
+
+            for (auto load : func.second) {
+
+                points_to_graph.addNode(load, NodeType::PTR);
 
             }
 
