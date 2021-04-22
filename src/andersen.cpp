@@ -2,13 +2,21 @@
 
 namespace llvm {
 
+
+    andersen::andersen() : ModulePass(ID) {
+    }
+
+    andersen::~andersen() {
+    }
+
+
     bool andersen::runOnModule(Module &M) {
         for(Function &F : M) {
             for(BasicBlock &B : F){
                 for(Instruction &I : B) {
-
                     if(AllocaInst *aI = dyn_cast<AllocaInst>(&I)) {
-                        outs() << aI << "\n";
+                        outs() << I.getName() << "\n";
+
                     }
 
                 }
@@ -16,10 +24,11 @@ namespace llvm {
         }
         return false;
     }
-    void getAnalysisUsage(AnalysisUsage& AU) {
+
+    void andersen::getAnalysisUsage(AnalysisUsage& AU) {
         AU.setPreservesAll();
     }
 
     char andersen::ID = 0;
-    RegisterPass<andersen> X("Andersen", "ECE 5984 final andersen");
+    RegisterPass<andersen> X("andersen", "ECE 5984 final andersen");
 }

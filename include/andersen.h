@@ -20,6 +20,7 @@
 #include "llvm/ADT/PostOrderIterator.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/IR/DerivedTypes.h"
+#include <vector>
 
 
 namespace llvm {
@@ -28,11 +29,11 @@ namespace llvm {
 
     public:
 
+      andersen();
       static char ID;
-      andersen() : ModulePass(ID) {}
-      
+      ~andersen();
 
-      virtual void getAnalysisUsage(AnalysisUsage &AU) const;
+      virtual void getAnalysisUsage(AnalysisUsage &AU);
       virtual bool runOnModule(Module &M);
 
   };

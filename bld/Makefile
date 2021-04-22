@@ -9,6 +9,7 @@ constraintCollector.o: constraintCollector.cpp constraintCollector.h
 
 %.so: %.o constraintGraph.o 
 	$(CXX) -dylib -shared $^ -o $@
+	rm constraintGraph.o
 
 clean:
 	rm -f *.o *.so
