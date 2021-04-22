@@ -53,6 +53,7 @@ namespace llvm {
 
             Node* getNode(Value* ref);
             Value* addNode(Value *ref, NodeType nodeTy);
+            Value* addNode(Value *ref, Node);
             void addEdge(Node* src, Node* dst);
             bool isPath(Node* src, Node* dst);
 
