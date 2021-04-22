@@ -23,26 +23,42 @@
 
 namespace llvm {
 
-    struct graphNode {
+    enum NodeType {
 
-        DenseSet<Value*> points_to;
-        DenseSet<graphNode*> siblings;
+        PTR,  
+        MEM
 
     };
 
+    struct Node {
+
+        Node(Value *ref, NodeType nodeTy) {
+
+            this->ref = ref;
+            this->nodeTy = nodeTy;
+        }
+
+        Value *ref;
+        NodeType nodeTy; 
+        DenseSet<Node*> children;
+
+    };
 
     class constraintGraph {
 
         public:
 
-            // constructors & destructors
             constraintGraph();
             ~constraintGraph();
 
+            Node* getNode(Value* ref);
+            Value* addNode(Value *ref, NodeType nodeTy);
+            void addEdge(Node* to, Node* from);
+            bool isPath(Node* to, Node* from);
 
         private:
 
-            std::vector<graphNode*> graphNodes;
+            DenseMap<Value*, Node*> cGraph;
 
     };
 }
