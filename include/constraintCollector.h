@@ -37,9 +37,10 @@ namespace llvm {
             void getAnalysisUsage(AnalysisUsage &AU) const;
             bool runOnModule(Module &M);
 
-            // constraints
-            DenseSet<GlobalValue*> global_constraints;
+            // global constrains are only for addr_taken type or function type
+            DenseSet<GlobalValue*> globalConstraints;
 
+            // constraints
             DenseMap<Function*, cSet> base;
             DenseMap<Function*, cSet> simple;
             DenseMap<Function*, cSet> complex1;
@@ -50,6 +51,7 @@ namespace llvm {
 
         private:
 
+            // helpers to populate constraint instructions in specific sets
             void globalConstraintCollector(Module &M);
             void functionConstraintCollector(Function &F);
 
