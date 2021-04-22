@@ -15,11 +15,12 @@
 #include "llvm/IR/CFG.h"
 #include "llvm/Pass.h"
 
-// included for convenience
 #include "llvm/ADT/PostOrderIterator.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/IR/DerivedTypes.h"
 
+#include "constraintCollector.h"
+#include "constraintGraph.h"
 
 namespace llvm {
 
@@ -32,6 +33,10 @@ namespace llvm {
 
       virtual void getAnalysisUsage(AnalysisUsage &AU) const;
       virtual bool runOnModule(Module &M);
+
+    private:
+
+      constraintGraph points_to_graph;
 
   };
 }

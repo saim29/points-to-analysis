@@ -11,7 +11,7 @@ namespace llvm {
 
     bool constraintCollector::runOnModule(Module &M) { 
 
-        // call helpler functions to collect constraints
+        // call helper functions to collect constraints
 
         globalConstraintCollector(M);
 
@@ -61,48 +61,48 @@ namespace llvm {
                 // we only care about instructions that are of pointer type
                 switch (I.getOpcode()) {
 
-                case Instruction::Alloca:
+                    case Instruction::Alloca:
 
-                    // alloca always results in a pointer type so we don't need to check if return type is pointer type
-                    base[&F].insert(&I);
-                    break;
-                
-                case Instruction::Store:
-
-                    // only insert if the src operand is of pointer type; format "store a, b" = " *a = b"
-                    if (I.getOperand(0)->getType()->isPointerTy())
-                        complex2[&F].insert(&I);
-                    break;
-                
-                case Instruction::Load:
-
-                    // only insert in constraints if a pointer is being loaded; format "a = load b" = "a = *b"
-                    if (I.getType()->isPointerTy())
-                        complex1[&F].insert(&I);
-                    break;
-                
-                case Instruction::Call:
-
-                    Function *callee = dyn_cast<CallBase>(&I)->getCalledFunction();
-
-                    // we only deal with user-defined functions
-                    // Technically speaking, we shouldn't trust any library functions that take pointers as arguments but we let that slide for out implementation
-                    if (callee->size() == 0)
+                        // alloca always results in a pointer type so we don't need to check if return type is pointer type
+                        base[&F].insert(&I);
                         break;
+                    
+                    case Instruction::Store:
 
-                    // only insert function calls that have pointer arguments or return a pointer type;
-                    if (callee->getReturnType()->isPointerTy() || hasPtrArgs(*callee))
-                        functionCalls[&F].insert(&I);
-                    break;
-                
-                // we break both as copy "a=b" since our analysis is field insensitive. There can be more copy instructions in the IR but we only deal with these two for now
-                case Instruction::GetElementPtr:
+                        // only insert if the src operand is of pointer type; format "store a, b" = " *a = b"
+                        if (I.getOperand(0)->getType()->isPointerTy())
+                            complex2[&F].insert(&I);
+                        break;
+                    
+                    case Instruction::Load:
 
-                case Instruction::BitCast:
-                                
-                default:
-                    simple[&F].insert(&I);
-                    break;
+                        // only insert in constraints if a pointer is being loaded; format "a = load b" = "a = *b"
+                        if (I.getType()->isPointerTy())
+                            complex1[&F].insert(&I);
+                        break;
+                    
+                    case Instruction::Call: {
+                        Function *callee = dyn_cast<CallBase>(&I)->getCalledFunction();
+
+                        // we only deal with user-defined functions
+                        // Technically speaking, we shouldn't trust any library functions that take pointers as arguments but we let that slide for out implementation
+                        if (callee->size() == 0)
+                            break;
+
+                        // only insert function calls that have pointer arguments or return a pointer type;
+                        if (callee->getReturnType()->isPointerTy() || hasPtrArgs(*callee))
+                            functionCalls[&F].insert(&I);
+                        break;
+                    }
+                    // we break both as copy "a=b" since our analysis is field insensitive. There can be more copy instructions in the IR but we only deal with these two for now
+                    case Instruction::GetElementPtr:
+
+                    case Instruction::BitCast:
+                        simple[&F].insert(&I);
+
+                                    
+                    default:
+                        break;
                 }
 
             }

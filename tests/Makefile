@@ -2,7 +2,7 @@ all: tests
 
 tests: basic.ll
 llvm_alias_res: basic.llvm.res
-alias_res: basic.AA.res
+custom_alias_res: basic.custom.res
 
 %.ll : %.c
 	clang -Xclang -disable-O0-optnone -O0 -emit-llvm -S -c $<
@@ -10,9 +10,10 @@ alias_res: basic.AA.res
 %.llvm.res: %.ll
 	opt -basic-aa -print-alias-sets -time-passes $< 2> $@
 
-%.AA.res: %ll
+%.custom.res: %.ll
+	opt -load ../bld/andersen.so --basic-aa-custom -time-passes $< 2> $@
 
 clean: 
-	rm -f *.ll *.bc *.llvm.res
+	rm -f *.ll *.bc *.llvm.res *.custom.res
 
 .PHONY: clean all tests llvm_alias_res alias_res
