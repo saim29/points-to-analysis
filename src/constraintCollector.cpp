@@ -52,6 +52,7 @@ namespace llvm {
         complex1.insert({&F, cSet()});
         complex2.insert({&F, cSet()});
         functionCalls.insert({&F, cSet()});
+        functionRet.insert({&F, cSet()});
 
         // traverse the function CFG (not important to traverse in any particular order)
         for (BasicBlock &B : F) {
@@ -93,6 +94,25 @@ namespace llvm {
                         if (callee->getReturnType()->isPointerTy() || hasPtrArgs(*callee))
                             functionCalls[&F].insert(&I);
                         break;
+                    }
+
+                    case Instruction::Ret:{
+
+                        // this is a special case for COPY. We treat it differently because it is important for interprocedural analysis
+
+                        ReturnInst *ret = dyn_cast<ReturnInst>(&I);
+
+                        // if return value is not null
+                        if (Value *retVal = ret->getReturnValue()){
+
+                            // if retVal is pointer Type
+                            if (retVal->getType()->isPointerTy())
+                                functionRet[&F].insert(&I);
+
+                        }
+
+                        break;
+
                     }
                     // we break both as copy "a=b" since our analysis is field insensitive. There can be more copy instructions in the IR but we only deal with these two for now
                     case Instruction::GetElementPtr:

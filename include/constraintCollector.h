@@ -48,6 +48,7 @@ namespace llvm {
 
             // eventhough these aren't constrains, we treat them as such for interprocedural analysis
             DenseMap<Function*, cSet> functionCalls;
+            DenseMap<Function*, cSet> functionRet;
 
         private:
 
