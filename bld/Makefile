@@ -7,7 +7,7 @@ VPATH = ../src ../include
 constraintGraph.o: constraintGraph.cpp constraintGraph.h
 constraintCollector.o: constraintCollector.cpp constraintCollector.h
 
-%.so: %.o constraintGraph.o 
+%.so: %.o constraintGraph.o constraintCollector.o
 	$(CXX) -dylib -shared $^ -o $@
 
 clean:
