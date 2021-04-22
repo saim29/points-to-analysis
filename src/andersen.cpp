@@ -18,6 +18,16 @@ namespace llvm {
         return false;
     }
 
+    void andersen::initConstraintGraph(DenseMap<Function*, cSet> base, DenseMap<Function*, cSet> simple,
+        DenseMap<Function*, cSet> global) {
+
+    }
+
+    void andersen::solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2) {
+
+    }
+
+
   char andersen::ID = 0;
   RegisterPass<andersen> Y("basic-aa-custom", "Andersen's Analysis");
 }

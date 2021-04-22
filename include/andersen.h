@@ -36,7 +36,18 @@ namespace llvm {
 
     private:
 
+      // graph to store all points-to relations
       constraintGraph points_to_graph;
+
+      // method to initialize initial constraint graph
+      void initConstraintGraph(DenseMap<Function*, cSet> base, DenseMap<Function*, cSet> simple,
+          DenseMap<Function*, cSet> global);
+
+      // an iterative solver for complex constraints
+      void solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2);
+
+      // an iterative solver to add callInstruction constraints in our graph
+      void addInterproceduralInfo(DenseMap<Function*, cSet> calls);
 
   };
 }
