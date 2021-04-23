@@ -51,15 +51,16 @@ namespace llvm {
             constraintGraph();
             ~constraintGraph();
 
-            Node* getNode(Value* ref);
+            Node* getPtrNode(Value* ref);
+            Node* getMemNode(Value* ref);
             Value* addNode(Value *ref, NodeType nodeTy);
-            Value* addNode(Value *ref, Node);
             void addEdge(Node* src, Node* dst);
             bool isPath(Node* src, Node* dst);
 
         private:
 
-            DenseMap<Value*, Node*> cGraph;
+            DenseMap<Value*, Node*> ptr;
+            DenseMap<Value*, Node*> mem;
 
     };
 }

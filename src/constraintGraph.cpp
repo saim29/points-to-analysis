@@ -8,17 +8,31 @@ namespace llvm {
 
     constraintGraph::~constraintGraph() {
 
-        for(auto node : cGraph) {
+        for(auto node : ptr) {
+
+            delete node.second;
+        }
+
+        for(auto node : mem) {
 
             delete node.second;
         }
 
     }
 
-    Node* constraintGraph::getNode(Value *ref) {
+    Node* constraintGraph::getPtrNode(Value *ref) {
 
-        if (cGraph.find(ref) != cGraph.end())
-            return cGraph[ref];
+        if (ptr.find(ref) != ptr.end())
+            return ptr[ref];
+        
+        return NULL;
+
+    }
+
+    Node* constraintGraph::getMemNode(Value *ref) {
+
+        if (mem.find(ref) != mem.end())
+            return mem[ref];
         
         return NULL;
 
@@ -26,14 +40,33 @@ namespace llvm {
 
     Value* constraintGraph::addNode(Value *ref, NodeType nodeTy) {
 
-        Node *node = new Node(ref, nodeTy);
-        cGraph.insert({ref, node});
+        // create a pointer object in our ptr graph
+        Node *ptr_node = new Node(ref, PTR);
+        ptr.insert({ref, ptr_node});
+
+        // we only need to create a corresponding memory object for allocaInst
+        if (isa<AllocaInst>(ref)) {
+
+            if (nodeTy == PTR) {
+
+                Node *obj_node = new Node(ref, PTR);
+                mem.insert({ref, obj_node});
+
+            } else if (nodeTy == MEM) {
+
+                Node *obj_node = new Node(ref, MEM);
+                mem.insert({ref, obj_node});
+
+            }
+
+        }
+
         return ref;
     }
 
     void constraintGraph::addEdge(Node *src, Node *dst) {
 
-        cGraph[src->ref]->children.insert(dst);
+        ptr[src->ref]->children.insert(dst);
 
     }
 

@@ -88,9 +88,9 @@ namespace llvm {
                     points_to_graph.addNode(copy, NodeType::PTR);
                 }
 
-                // get nodes for specific values
-                Node* src = points_to_graph.getNode(copy);
-                Node* dst = points_to_graph.getNode(copy->getOperand(0));
+                // get ptr nodes for specific values (copy is equating two pointers)
+                Node* src = points_to_graph.getPtrNode(copy);
+                Node* dst = points_to_graph.getPtrNode(copy->getOperand(0));
 
                 // add an edge from src to dst to signify that dst can be pointed to by src
                 points_to_graph.addEdge(src, dst);
@@ -105,6 +105,6 @@ namespace llvm {
     }
 
 
-  char andersen::ID = 0;
-  RegisterPass<andersen> Y("basic-aa-custom", "Andersen's Analysis");
+    char andersen::ID = 0;
+    RegisterPass<andersen> Y("basic-aa-custom", "Andersen's Analysis");
 }
