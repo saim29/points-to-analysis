@@ -40,12 +40,18 @@ namespace llvm {
 
     Value* constraintGraph::addNode(Value *ref, NodeType nodeTy) {
 
-        // create a pointer object in our ptr graph
-        Node *ptr_node = new Node(ref, PTR);
-        ptr.insert({ref, ptr_node});
+        // we don't need a pointer node for functions
 
-        // we only need to create a corresponding memory object for allocaInst
-        if (isa<AllocaInst>(ref)) {
+        if (!isa<Function>(ref)) {
+
+            // create a pointer object in our ptr graph
+            Node *ptr_node = new Node(ref, PTR);
+            ptr.insert({ref, ptr_node});
+        
+        }
+
+        // we only need to create a corresponding memory object for allocaInst or functions
+        if (isa<AllocaInst>(ref) || isa<Function>(ref)) {
 
             if (nodeTy == PTR) {
 

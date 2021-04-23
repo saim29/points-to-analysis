@@ -102,8 +102,31 @@ namespace llvm {
 
     void andersen::solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2) {
 
-    }
+        // iterate over all constrainst and keep applying them until the graph stops changing
+        unsigned numIterations = 0;
+        bool changed = false;
 
+        do {
+
+            for (auto func : complex1) {
+
+                for (auto constraint : func.second) {
+
+                }
+            }
+
+            for (auto func: complex2) {
+
+                for (auto constraint : func.second) {
+                    
+                }
+
+            }
+
+            numIterations++;
+        } while (changed);
+
+    }
 
     char andersen::ID = 0;
     RegisterPass<andersen> Y("basic-aa-custom", "Andersen's Analysis");
