@@ -111,7 +111,6 @@ namespace llvm {
 
         do {
 
-            changed = false;
             for (auto func : complex1) {
 
                 for (auto constraint : func.second) {
@@ -128,10 +127,7 @@ namespace llvm {
                     }
                     unsigned af = dst->children.size();
 
-                    if (bef != af) {
-                        changed = true;
-                    }
-
+                    changed = bef != af || false;
                 }
             }
 
@@ -151,9 +147,8 @@ namespace llvm {
 
                         unsigned af = child->children.size();
 
-                        if (bef != af) {
-                            changed = true;
-                        }
+                        changed = bef != af || false;
+
                     }
 
                 }
@@ -186,10 +181,6 @@ namespace llvm {
             }
 
         }
-    }
-
-    void andersen::printPointsToInfo(){
-        
     }
 
     char andersen::ID = 0;

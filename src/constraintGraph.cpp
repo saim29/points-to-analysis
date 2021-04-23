@@ -20,6 +20,28 @@ namespace llvm {
 
     }
 
+    std::vector<Node*> constraintGraph::getNodeList(NodeType ty) {
+
+        std::vector<Node*> graphNodes;
+
+        if (ty == PTR) {
+
+            for(auto node : ptr) {
+
+                graphNodes.push_back(node.second);
+            }
+
+        } else if (ty == MEM){
+
+            for(auto node : mem) {
+
+                graphNodes.push_back(node.second);
+            }
+        }
+
+        return graphNodes;
+    }
+
     Node* constraintGraph::getPtrNode(Value *ref) {
 
         if (ptr.find(ref) != ptr.end())
@@ -38,7 +60,7 @@ namespace llvm {
 
     }
 
-    Value* constraintGraph::addNode(Value *ref, NodeType nodeTy) {
+    void constraintGraph::addNode(Value *ref, NodeType nodeTy) {
 
         // we don't need a pointer node for functions
 
@@ -56,28 +78,18 @@ namespace llvm {
         // we only need to create a corresponding memory object for allocaInst or functions
         if (isa<AllocaInst>(ref) || isa<Function>(ref)) {
 
-            if (nodeTy == PTR) {
-
-                obj_node = new Node(ref, MEM);
-                mem.insert({ref, obj_node});
-
-            } else if (nodeTy == MEM) {
-
-                obj_node = new Node(ref, MEM);
-                mem.insert({ref, obj_node});
-
-            }
+            obj_node = new Node(ref, MEM);
+            mem.insert({ref, obj_node});
 
         }
 
-        // if both are allocated then add an edge from the pointer to its corresponding mem object
+        // for memory allocations, add edge from ptr to mem obj
         if (ptr_node != NULL && obj_node != NULL) {
 
             addEdge(ptr_node, obj_node);
 
         }
 
-        return ref;
     }
 
     void constraintGraph::addEdge(Node *src, Node *dst) {

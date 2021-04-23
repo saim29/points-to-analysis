@@ -51,9 +51,10 @@ namespace llvm {
             constraintGraph();
             ~constraintGraph();
 
+            std::vector<Node*> getNodeList(NodeType ty);
             Node* getPtrNode(Value* ref);
             Node* getMemNode(Value* ref);
-            Value* addNode(Value *ref, NodeType nodeTy);
+            void addNode(Value *ref, NodeType nodeTy);
             void addEdge(Node* src, Node* dst);
             bool isPath(Node* src, Node* dst);
 

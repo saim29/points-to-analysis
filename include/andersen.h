@@ -50,9 +50,6 @@ namespace llvm {
       // an iterative solver to add callInstruction constraints in our graph
       void addInterproceduralInfo(DenseMap<Function*, cSet> calls);
 
-      // helpers for printing
-      void printPointsToInfo();
-
   };
 }
 
