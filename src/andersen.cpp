@@ -16,6 +16,9 @@ namespace llvm {
         // populate graph
         initConstraintGraph(constraints.base, constraints.simple, constraints.complex1, constraints.globalConstraints);
 
+        // solve the graph iteratively
+        solveConstraintGraph(constraints.complex1, constraints.complex2);
+
         return false;
     }
 
@@ -108,6 +111,7 @@ namespace llvm {
 
         do {
 
+            changed = false;
             for (auto func : complex1) {
 
                 for (auto constraint : func.second) {
@@ -116,6 +120,17 @@ namespace llvm {
                     Node* dst = points_to_graph.getPtrNode(constraint);
 
                     // add an edge from dst to all children of src
+                    unsigned bef = dst->children.size();
+                    for (auto child: src->children) {
+
+                        points_to_graph.addEdge(dst, src);
+
+                    }
+                    unsigned af = dst->children.size();
+
+                    if (bef != af) {
+                        changed = true;
+                    }
 
                 }
             }
@@ -129,6 +144,18 @@ namespace llvm {
 
                     // add an edge from all children of dst to src
 
+                    for (auto child: dst->children) {
+                        
+                        unsigned bef = child->children.size();
+                        points_to_graph.addEdge(child, src);
+
+                        unsigned af = child->children.size();
+
+                        if (bef != af) {
+                            changed = true;
+                        }
+                    }
+
                 }
 
             }
@@ -136,13 +163,14 @@ namespace llvm {
             numIterations++;
         } while (changed);
 
+        errs() << "Convergence: " << numIterations << "\n";
     }
 
-    bool andersen::addEdgeRecursive(Node *from, Node *to, bool constraint, DenseSet<Node*> &visited) {
+    void andersen::addEdgeRecursive(Node *from, Node *to, bool constraint, DenseSet<Node*> &visited) {
 
         // if leaf node or node already visited
         if (visited.find(to) != visited.end() || to->nodeTy == MEM) {
-            return false;
+            return ;
         }
 
         bool hasChanged = false;
@@ -158,6 +186,10 @@ namespace llvm {
             }
 
         }
+    }
+
+    void andersen::printPointsToInfo(){
+        
     }
 
     char andersen::ID = 0;

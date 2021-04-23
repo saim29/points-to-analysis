@@ -58,7 +58,7 @@ namespace llvm {
 
             if (nodeTy == PTR) {
 
-                obj_node = new Node(ref, PTR);
+                obj_node = new Node(ref, MEM);
                 mem.insert({ref, obj_node});
 
             } else if (nodeTy == MEM) {
@@ -74,6 +74,7 @@ namespace llvm {
         if (ptr_node != NULL && obj_node != NULL) {
 
             addEdge(ptr_node, obj_node);
+
         }
 
         return ref;
@@ -81,7 +82,10 @@ namespace llvm {
 
     void constraintGraph::addEdge(Node *src, Node *dst) {
 
-        ptr[src->ref]->children.insert(dst);
+        if (src->nodeTy == PTR)
+            ptr[src->ref]->children.insert(dst);
+        else 
+            mem[src->ref]->children.insert(dst);
 
     }
 

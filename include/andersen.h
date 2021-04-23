@@ -45,10 +45,13 @@ namespace llvm {
 
       // an iterative solver for complex constraints
       void solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2);
-      bool addEdgeRecursive(Node *from, Node *to, bool constraint, DenseSet<Node*> &visited);
+      void addEdgeRecursive(Node *from, Node *to, bool constraint, DenseSet<Node*> &visited);
 
       // an iterative solver to add callInstruction constraints in our graph
       void addInterproceduralInfo(DenseMap<Function*, cSet> calls);
+
+      // helpers for printing
+      void printPointsToInfo();
 
   };
 }
