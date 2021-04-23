@@ -42,10 +42,13 @@ namespace llvm {
 
         // we don't need a pointer node for functions
 
+        Node *ptr_node = NULL;
+        Node *obj_node = NULL;
+
         if (!isa<Function>(ref)) {
 
             // create a pointer object in our ptr graph
-            Node *ptr_node = new Node(ref, PTR);
+            ptr_node = new Node(ref, PTR);
             ptr.insert({ref, ptr_node});
         
         }
@@ -55,16 +58,22 @@ namespace llvm {
 
             if (nodeTy == PTR) {
 
-                Node *obj_node = new Node(ref, PTR);
+                obj_node = new Node(ref, PTR);
                 mem.insert({ref, obj_node});
 
             } else if (nodeTy == MEM) {
 
-                Node *obj_node = new Node(ref, MEM);
+                obj_node = new Node(ref, MEM);
                 mem.insert({ref, obj_node});
 
             }
 
+        }
+
+        // if both are allocated then add an edge from the pointer to its corresponding mem object
+        if (ptr_node != NULL && obj_node != NULL) {
+
+            addEdge(ptr_node, obj_node);
         }
 
         return ref;

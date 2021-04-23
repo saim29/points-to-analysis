@@ -102,7 +102,7 @@ namespace llvm {
 
     void andersen::solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2) {
 
-        // iterate over all constrainst and keep applying them until the graph stops changing
+        // iterate over all constraints and keep applying them until the graph stops changing
         unsigned numIterations = 0;
         bool changed = false;
 
@@ -112,13 +112,23 @@ namespace llvm {
 
                 for (auto constraint : func.second) {
 
+                    Node* src = points_to_graph.getPtrNode(constraint->getOperand(0));
+                    Node* dst = points_to_graph.getPtrNode(constraint);
+
+                    // add an edge from dst to all children of src
+
                 }
             }
 
             for (auto func: complex2) {
 
                 for (auto constraint : func.second) {
-                    
+
+                    Node* src = points_to_graph.getPtrNode(constraint->getOperand(0));
+                    Node* dst = points_to_graph.getPtrNode(constraint->getOperand(1));
+
+                    // add an edge from all children of dst to src
+
                 }
 
             }
