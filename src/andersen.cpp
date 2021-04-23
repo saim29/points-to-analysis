@@ -138,6 +138,28 @@ namespace llvm {
 
     }
 
+    bool andersen::addEdgeRecursive(Node *from, Node *to, bool constraint, DenseSet<Node*> &visited) {
+
+        // if leaf node or node already visited
+        if (visited.find(to) != visited.end() || to->nodeTy == MEM) {
+            return false;
+        }
+
+        bool hasChanged = false;
+        visited.insert(to);
+        for (auto child : to->children) {
+
+            addEdgeRecursive(from, child, constraint, visited);
+            if (constraint) {
+                points_to_graph.addEdge(from, child);
+            }
+            else {
+                points_to_graph.addEdge(child, from);
+            }
+
+        }
+    }
+
     char andersen::ID = 0;
     RegisterPass<andersen> Y("basic-aa-custom", "Andersen's Analysis");
 }
