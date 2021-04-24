@@ -19,6 +19,9 @@ namespace llvm {
         // solve the graph iteratively
         solveConstraintGraph(constraints.complex1, constraints.complex2);
 
+        // compute poiints-to set for every graph node
+        points_to_graph.computePointsToSets();
+
         return false;
     }
 

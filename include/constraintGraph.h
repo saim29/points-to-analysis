@@ -44,6 +44,9 @@ namespace llvm {
 
     };
 
+    typedef DenseSet<Node*> PointsToSet;
+    typedef DenseMap<Node*, PointsToSet> PointsToSets;
+
     class constraintGraph {
 
         public:
@@ -57,6 +60,7 @@ namespace llvm {
             void addNode(Value *ref, NodeType nodeTy);
             void addEdge(Node* src, Node* dst);
             bool isPath(Node* src, Node* dst);
+            PointsToSets computePointsToSets();
 
         private:
 
