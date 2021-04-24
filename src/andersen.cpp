@@ -8,11 +8,16 @@ namespace llvm {
 
     void andersen::getAnalysisUsage(AnalysisUsage &AU) const {
 
+        // run the constraint collector pass before this one
         AU.addRequired<constraintCollector>();
         AU.setPreservesAll();
     }
 
     bool andersen::runOnModule(Module &M) {
+
+        // this builds the points-to-graph of every function in M using constraintCollector and constraintGraph classes
+        // Note that our implementation does not handle used uninitialized pointers since they point to garbage
+        // pointers must be assigned some memory location before they are used
 
         // collect all required constraints 
         constraintCollector &constraints = getAnalysis<constraintCollector>();
@@ -183,6 +188,65 @@ namespace llvm {
 
                 }
 
+            }
+
+            // only do this if interprocedural flag is set
+            if (interprocedural) {
+
+                // we only deal with calls that involve pointer operands; We ignore all other calls; this is handled in constraintCollector
+                for (auto func: calls) {
+                    
+                    // the graph for the function has already been built and initialized
+                    // the graph for each function is a connected component currently
+                    // we just need to add edges from the ptr args of the fucntion since passing an argument is equivalent to copy
+                    // this is equivalent to connecting the points-to-graph of functions
+
+                    for (auto call: func.second) {
+
+                        CallBase *base = dyn_cast<CallBase>(call);
+                        Function *callee = base->getCalledFunction();
+                        std::vector<Value*> callArgs;
+                        std::vector<Value*> funcArgs;
+
+                        // go over all call instruction arguments and function arguments
+                        for (int i=0; i<base->getNumOperands(); i++) {
+
+                            // get corresponding call args and function args
+                            Value *funcOp = callee->getArg(i);
+                            Value *callOp = base->getArgOperand(i);
+
+                            // only insert pointer arguments in vector
+                            if (callOp->getType()->isPointerTy()) {
+
+                                funcArgs.push_back(funcOp);
+                                callArgs.push_back(callOp);
+
+                            }
+                        }
+
+                    // add edges from function arg to children of call arg; similar to a = b, where a is the function arg and b is the passed arg
+
+                        for (int i=0; i<funcArgs.size(); i++){
+
+                            Node *src = points_to_graph.getPtrNode(callArgs[i]);
+                            Node *dst = points_to_graph.getPtrNode(funcArgs[i]);
+
+                            unsigned bef = dst->children.size();
+                            for(auto child : src->children)
+                                points_to_graph.addEdge(dst, child);
+
+                            unsigned af = dst->children.size();
+
+                            changed = bef != af || false;
+                        }
+                    }
+                }
+
+                // we only deal with return instructions that return a pointer
+                for (auto ret : rets) {
+
+
+                }
             }
 
             numIterations++;
