@@ -26,23 +26,18 @@ namespace llvm {
         // compute poiints-to set for every graph node
         PointsToSets pSets = points_to_graph.computePointsToSets();
 
-        std::vector<Node*> graph_nodes = points_to_graph.getNodeList(PTR);
-        for (auto mem_node : points_to_graph.getNodeList(MEM)) {
-            graph_nodes.push_back(mem_node);
-        }
-
         // if flag is set only then print sets, otherwise ignore
         if (printSets) {
             // print points-to sets
             errs() << "Points to sets\n";
-            for(auto node : graph_nodes) {
+            for(auto node : pSets) {
 
                 errs() << "\n\n--------------------------\n";
-                errs() << "Set for: "<< node->nodeTy;
-                node->ref->dump();
+                errs() << "Set for: "<< node.first->nodeTy;
+                node.first->ref->dump();
                 errs() << "--------------------------\n";
 
-                for (auto child : node->children) {
+                for (auto child : node.second) {
 
                     errs() << "Node Ref: " << child->nodeTy;
                     child->ref->dump();

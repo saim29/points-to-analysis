@@ -148,35 +148,11 @@ namespace llvm {
             nodes.push_back(memNode);
         }
 
-        for(auto node : nodes) {
+        for (auto node : nodes) {
 
-            if (visited.find(node) != visited.end())
-                continue;
+            for (auto child: node->children) {
 
-            std::queue<Node*> node_queue;
-            node_queue.push(node);
-
-            while (!node_queue.empty()) {
-
-                Node *cur = node_queue.front();
-                node_queue.pop();
-
-                visited.insert(cur);
-
-                for (auto child : cur->children) {
-
-                    if (visited.find(child) == visited.end()) {
-
-                        node_queue.push(child);
-                        pSet[node].insert(child);
-
-                    } else {
-
-                        for (auto child_node : pSet[child])
-                            pSet[node].insert(child_node);
-
-                    }
-                }
+                pSet[node].insert(child);
             }
         }
 
