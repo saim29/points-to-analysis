@@ -168,7 +168,9 @@ namespace llvm {
                     for (auto child: dst->children) {
                         
                         unsigned bef = child->children.size();
-                        points_to_graph.addEdge(child, src);
+
+                        for (auto src_child : src->children)
+                            points_to_graph.addEdge(child, src_child);
 
                         unsigned af = child->children.size();
 
