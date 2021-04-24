@@ -29,18 +29,17 @@ namespace llvm {
 
         // print points-to sets
         errs() << "Points to sets\n";
-        for(auto set : graph_nodes) {
+        for(auto node : graph_nodes) {
 
+            errs() << "\n\n--------------------------\n";
+            errs() << "Set for: "<< node->nodeTy;
+            node->ref->dump();
             errs() << "--------------------------\n";
-            errs() << "Set for: ";
-            set->ref->dump();
-            errs() << "--------------------------\n";
 
-            for (auto node : set->children) {
+            for (auto child : node->children) {
 
-                errs() << "Node Type: " << node->nodeTy << "\n";
-                errs() << "Node Ref: ";
-                node->ref->dump();
+                errs() << "Node Ref: " << child->nodeTy;
+                child->ref->dump();
             } 
         }
 
@@ -147,7 +146,7 @@ namespace llvm {
                     unsigned bef = dst->children.size();
                     for (auto child: src->children) {
 
-                        points_to_graph.addEdge(dst, src);
+                        points_to_graph.addEdge(dst, child);
 
                     }
                     unsigned af = dst->children.size();
