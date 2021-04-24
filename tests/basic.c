@@ -1,3 +1,8 @@
+/*
+    Basic test
+*/
+
+
 int main(void) {
     int b = 1, f = 2;
     //Type 1
