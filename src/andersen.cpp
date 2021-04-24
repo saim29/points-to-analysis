@@ -110,7 +110,7 @@ namespace llvm {
 
             for (auto copy: func.second) {
 
-                //copy can introduce new nodes in the graph if they are pointers; we don't care about copy introducing new MEM nodes because they can't doing to anything
+                //copy can introduce new nodes in the graph if they are pointers; we don't care about copy introducing new MEM nodes
                 if (copy->getType()->isPointerTy()) {
                     points_to_graph.addNode(copy, NodeType::PTR);
                 }
@@ -119,8 +119,9 @@ namespace llvm {
                 Node* src = points_to_graph.getPtrNode(copy);
                 Node* dst = points_to_graph.getPtrNode(copy->getOperand(0));
 
-                // add an edge from src to dst to signify that dst can be pointed to by src
-                points_to_graph.addEdge(src, dst);
+                // add an edge from src to children of dst
+                for (auto child: dst->children)
+                    points_to_graph.addEdge(src, child);
             }
 
         }
