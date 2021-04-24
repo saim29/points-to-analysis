@@ -150,7 +150,7 @@ namespace llvm {
 
         for(auto node : nodes) {
 
-            if (visited.find(node) == visited.end())
+            if (visited.find(node) != visited.end())
                 continue;
 
             std::queue<Node*> node_queue;

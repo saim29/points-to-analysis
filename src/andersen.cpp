@@ -20,7 +20,24 @@ namespace llvm {
         solveConstraintGraph(constraints.complex1, constraints.complex2);
 
         // compute poiints-to set for every graph node
-        points_to_graph.computePointsToSets();
+        PointsToSets pSets = points_to_graph.computePointsToSets();
+
+        // print points-to sets
+        errs() << "Points to sets\n";
+        for(auto set : pSets) {
+
+            errs() << "--------------------------\n";
+            errs() << "Set for: ";
+            set.first->ref->dump();
+            errs() << "--------------------------\n";
+
+            for (auto node : set.second) {
+
+                errs() << "Node Type: " << node->nodeTy << "\n";
+                errs() << "Node Ref: ";
+                node->ref->dump();
+            } 
+        }
 
         return false;
     }
