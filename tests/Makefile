@@ -11,7 +11,7 @@ custom_alias_res: basic.custom.res
 	opt -basic-aa -print-alias-sets -time-passes $< 2> $@
 
 %.custom.res: %.ll
-	opt -load ../bld/andersen.so --basic-aa-custom -time-passes $< 2> $@
+	opt -load ../bld/andersen.so --basic-aa-custom -print-pts-to-sets -time-passes $< 2> $@
 
 clean: 
 	rm -f *.ll *.bc *.llvm.res *.custom.res

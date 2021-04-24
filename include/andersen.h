@@ -22,6 +22,8 @@
 #include "constraintCollector.h"
 #include "constraintGraph.h"
 
+#include "llvm/Support/CommandLine.h"
+
 namespace llvm {
 
   class andersen : public ModulePass {
@@ -44,7 +46,8 @@ namespace llvm {
           DenseMap<Function*, cSet> loads, DenseSet<GlobalValue*> global);
 
       // an iterative solver for complex constraints
-      void solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2);
+      void solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2,
+        DenseMap<Function*, cSet> calls, DenseMap<Function*, cSet> rets);
       void addEdgeRecursive(Node *from, Node *to, bool constraint, DenseSet<Node*> &visited);
 
       // an iterative solver to add callInstruction constraints in our graph

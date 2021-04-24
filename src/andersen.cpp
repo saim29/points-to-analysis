@@ -2,6 +2,10 @@
 
 namespace llvm {
 
+    // commandline arguments
+    cl::opt<bool> interprocedural ("interprocedural", cl::desc("Run across functions"));
+    cl::opt<bool> printSets ("print-pts-to-sets", cl::desc("Print sets to stderr"));
+
     void andersen::getAnalysisUsage(AnalysisUsage &AU) const {
 
         AU.addRequired<constraintCollector>();
@@ -17,7 +21,7 @@ namespace llvm {
         initConstraintGraph(constraints.base, constraints.simple, constraints.complex1, constraints.globalConstraints);
 
         // solve the graph iteratively
-        solveConstraintGraph(constraints.complex1, constraints.complex2);
+        solveConstraintGraph(constraints.complex1, constraints.complex2, constraints.functionCalls, constraints.functionRet);
 
         // compute poiints-to set for every graph node
         PointsToSets pSets = points_to_graph.computePointsToSets();
@@ -27,20 +31,23 @@ namespace llvm {
             graph_nodes.push_back(mem_node);
         }
 
-        // print points-to sets
-        errs() << "Points to sets\n";
-        for(auto node : graph_nodes) {
+        // if flag is set only then print sets, otherwise ignore
+        if (printSets) {
+            // print points-to sets
+            errs() << "Points to sets\n";
+            for(auto node : graph_nodes) {
 
-            errs() << "\n\n--------------------------\n";
-            errs() << "Set for: "<< node->nodeTy;
-            node->ref->dump();
-            errs() << "--------------------------\n";
+                errs() << "\n\n--------------------------\n";
+                errs() << "Set for: "<< node->nodeTy;
+                node->ref->dump();
+                errs() << "--------------------------\n";
 
-            for (auto child : node->children) {
+                for (auto child : node->children) {
 
-                errs() << "Node Ref: " << child->nodeTy;
-                child->ref->dump();
-            } 
+                    errs() << "Node Ref: " << child->nodeTy;
+                    child->ref->dump();
+                } 
+            }
         }
 
         return false;
@@ -128,7 +135,8 @@ namespace llvm {
 
     }
 
-    void andersen::solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2) {
+    void andersen::solveConstraintGraph(DenseMap<Function*, cSet> complex1, DenseMap<Function*, cSet> complex2, 
+        DenseMap<Function*, cSet> calls, DenseMap<Function*, cSet> rets) {
 
         // iterate over all constraints and keep applying them until the graph stops changing
         unsigned numIterations = 0;
