@@ -144,6 +144,7 @@ namespace llvm {
 
         do {
 
+            changed = false;
             for (auto func : complex1) {
 
                 for (auto constraint : func.second) {
@@ -160,7 +161,7 @@ namespace llvm {
                     }
                     unsigned af = dst->children.size();
 
-                    changed = bef != af || false;
+                    changed = bef != af || changed || false;
                 }
             }
 
@@ -182,7 +183,7 @@ namespace llvm {
 
                         unsigned af = child->children.size();
 
-                        changed = bef != af || false;
+                        changed = bef != af || changed || false;
 
                     }
 
@@ -202,6 +203,9 @@ namespace llvm {
                     // this is equivalent to connecting the points-to-graph of functions
 
                     for (auto call: func.second) {
+
+                        // we do this as an initialization step for all calls; This is utilized for ret instructions that return a pointer
+                        points_to_graph.addNode(call, NodeType::PTR);
 
                         CallBase *base = dyn_cast<CallBase>(call);
                         Function *callee = base->getCalledFunction();
@@ -224,7 +228,7 @@ namespace llvm {
                             }
                         }
 
-                    // add edges from function arg to children of call arg; similar to a = b, where a is the function arg and b is the passed arg
+                        // add edges from function arg to children of call arg; similar to a = b, where a is the function arg and b is the passed arg
 
                         for (int i=0; i<funcArgs.size(); i++){
 
@@ -237,15 +241,25 @@ namespace llvm {
 
                             unsigned af = dst->children.size();
 
-                            changed = bef != af || false;
+                            changed = bef != af || changed || false;
+                        }
+
+                        // we only deal with return instructions that return a pointer. We do this for callee
+                        for (auto ret : rets[callee]) {
+
+                            // this is equivalent to a = retval; This is a special case for simple constraint. we add edges from a to children of retval;
+                            Node* retNode = points_to_graph.getPtrNode(ret);
+                            Node* callNode = points_to_graph.getPtrNode(call);
+
+                            unsigned bef = callNode->children.size();
+                            for (auto child: retNode->children)
+                                points_to_graph.addEdge(callNode, child);
+
+                            unsigned af = callNode->children.size();
+                            changed = bef != af || changed || false;
+
                         }
                     }
-                }
-
-                // we only deal with return instructions that return a pointer
-                for (auto ret : rets) {
-
-
                 }
             }
 
