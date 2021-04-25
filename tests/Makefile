@@ -1,6 +1,7 @@
 all: tests
 
-tests: basic.ll
+test_src := $(wildcard *.c)
+tests: $(test_src:.c=.ll)
 llvm_alias_res: basic.llvm.res
 custom_alias_res: basic.custom.res
 
