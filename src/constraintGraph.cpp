@@ -75,8 +75,8 @@ namespace llvm {
         
         }
 
-        // we only need to create a corresponding memory object for allocaInst or functions
-        if (isa<AllocaInst>(ref) || isa<Function>(ref)) {
+        // we only need to create a corresponding memory object for allocaInst, functions and global variables
+        if (isa<AllocaInst>(ref) || isa<GlobalObject>(ref)) {
 
             obj_node = new Node(ref, MEM);
             mem.insert({ref, obj_node});

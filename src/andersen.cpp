@@ -38,13 +38,13 @@ namespace llvm {
             for(auto node : pSets) {
 
                 errs() << "\n\n--------------------------\n";
-                errs() << "Set for: "<< node.first->nodeTy;
+                errs() << "Set for: "<< node.first->nodeTy << " ";
                 node.first->ref->dump();
                 errs() << "--------------------------\n";
 
                 for (auto child : node.second) {
 
-                    errs() << "Node Ref: " << child->nodeTy;
+                    errs() << "Node Ref: " << child->nodeTy << " ";
                     child->ref->dump();
                 } 
             }
@@ -65,7 +65,7 @@ namespace llvm {
                 // otherwise if it points to a pointer then it can potentially point to other things
                 // SSA is immutable hence we can map pointers that point to mem locations as mem locations only
                 // this makes our analysis easier
-                if (gv->getType()->getContainedType(0)->isPointerTy())
+                if (gv->getType()->getContainedType(0)->isPointerTy()) 
                     points_to_graph.addNode(constraint, NodeType::PTR);
                 else 
                     points_to_graph.addNode(constraint, NodeType::MEM);
@@ -161,7 +161,7 @@ namespace llvm {
                     }
                     unsigned af = dst->children.size();
 
-                    changed = bef != af || changed || false;
+                    changed = bef != af || changed;
                 }
             }
 
@@ -183,7 +183,7 @@ namespace llvm {
 
                         unsigned af = child->children.size();
 
-                        changed = bef != af || changed || false;
+                        changed = bef != af || changed;
 
                     }
 
@@ -241,14 +241,14 @@ namespace llvm {
 
                             unsigned af = dst->children.size();
 
-                            changed = bef != af || changed || false;
+                            changed = bef != af || changed;
                         }
 
                         // we only deal with return instructions that return a pointer. We do this for callee
                         for (auto ret : rets[callee]) {
 
                             // this is equivalent to a = retval; This is a special case for simple constraint. we add edges from a to children of retval;
-                            Node* retNode = points_to_graph.getPtrNode(ret);
+                            Node* retNode = points_to_graph.getPtrNode(ret->getOperand(0));
                             Node* callNode = points_to_graph.getPtrNode(call);
 
                             unsigned bef = callNode->children.size();
@@ -256,7 +256,7 @@ namespace llvm {
                                 points_to_graph.addEdge(callNode, child);
 
                             unsigned af = callNode->children.size();
-                            changed = bef != af || changed || false;
+                            changed = bef != af || changed;
 
                         }
                     }

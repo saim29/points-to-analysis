@@ -26,7 +26,9 @@ namespace llvm {
         // get list of global variables
         for (auto &glob : M.getGlobalList()) {
 
-            globalConstraints.insert(&glob);
+            if (glob.getType()->isPointerTy()) {
+                globalConstraints.insert(&glob);
+            }
             
         } 
 
