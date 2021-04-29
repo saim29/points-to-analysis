@@ -36,11 +36,8 @@ namespace llvm {
         for (auto &func: M.getFunctionList()) {
 
             // we only care about functions that have their address taken i.e f = &myFunc;
-            if (func.hasAddressTaken()) {
 
-                globalConstraints.insert(&func);
-
-            }
+            globalConstraints.insert(&func);
 
         }
 

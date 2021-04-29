@@ -23,18 +23,20 @@ namespace llvm {
         constraintCollector &constraints = getAnalysis<constraintCollector>();
 
         // populate graph
+        errs() << "Initializing Graph ...";
         initConstraintGraph(constraints.base, constraints.simple, constraints.complex1, constraints.globalConstraints);
-
+        errs() << " Initialized!!!\n";
         // solve the graph iteratively
+        errs() << "Solving Graph ... \n";
         solveConstraintGraph(constraints.complex1, constraints.complex2, constraints.functionCalls, constraints.functionRet);
-
+        errs() << " Solved!!!\n";
         // compute poiints-to set for every graph node
         PointsToSets pSets = points_to_graph.computePointsToSets();
 
         // if flag is set only then print sets, otherwise ignore
         if (printSets) {
             // print points-to sets
-            errs() << "Points to sets\n";
+            errs() << "\n\nPoints to sets:";
             for(auto node : pSets) {
 
                 errs() << "\n\n--------------------------\n";
@@ -58,7 +60,7 @@ namespace llvm {
 
         // add constraints for all global placeholders e.g functions and global variables
         for(GlobalValue* constraint : global) {
-
+            
             if (GlobalVariable *gv = dyn_cast<GlobalVariable>(constraint)) {
 
                 // if the pointer points to a mem location then it is a leaf in our graph i.e node with no children
@@ -177,9 +179,9 @@ namespace llvm {
                     for (auto child: dst->children) {
                         
                         unsigned bef = child->children.size();
-
-                        for (auto src_child : src->children)
+                        for (auto src_child : src->children) {
                             points_to_graph.addEdge(child, src_child);
+                        }
 
                         unsigned af = child->children.size();
 
@@ -213,7 +215,7 @@ namespace llvm {
                         std::vector<Value*> funcArgs;
 
                         // go over all call instruction arguments and function arguments
-                        for (int i=0; i<base->getNumOperands(); i++) {
+                        for (int i=0; i<base->getNumArgOperands(); i++) {
 
                             // get corresponding call args and function args
                             Value *funcOp = callee->getArg(i);
