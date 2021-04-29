@@ -41,13 +41,21 @@ namespace llvm {
 
                 errs() << "\n\n--------------------------\n";
                 errs() << "Set for: "<< node.first->nodeTy << " ";
-                node.first->ref->dump();
+                if (Function *func = dyn_cast<Function>(node.first->ref)) {
+                    errs() << func->getName() << "\n";
+                } else {
+                    node.first->ref->dump();
+                }
                 errs() << "--------------------------\n";
 
                 for (auto child : node.second) {
 
                     errs() << "Node Ref: " << child->nodeTy << " ";
-                    child->ref->dump();
+                    if (Function *child_func = dyn_cast<Function>(child->ref)) {
+                        errs() << child_func->getName() << "\n";
+                    } else {
+                        child->ref->dump();
+                    }
                 } 
             }
         }
@@ -210,56 +218,76 @@ namespace llvm {
                         points_to_graph.addNode(call, NodeType::PTR);
 
                         CallBase *base = dyn_cast<CallBase>(call);
-                        Function *callee = base->getCalledFunction();
-                        std::vector<Value*> callArgs;
-                        std::vector<Value*> funcArgs;
+                        Function *callee_func = base->getCalledFunction();
+                        std::vector<Function*> possibleFuncs;
 
-                        // go over all call instruction arguments and function arguments
-                        for (int i=0; i<base->getNumArgOperands(); i++) {
+                        if (callee_func == NULL) {
+                            //get possible function calls
+                            Value *func_ptr = base->getOperand(0);
+                            Node *func_ptr_node = points_to_graph.getPtrNode(func_ptr);
 
-                            // get corresponding call args and function args
-                            Value *funcOp = callee->getArg(i);
-                            Value *callOp = base->getArgOperand(i);
+                            if (func_ptr_node) {
+                                for (auto child : func_ptr_node->children) {
+                                    
+                                    if (auto child_func = dyn_cast<Function>(child->ref))
+                                        possibleFuncs.push_back(child_func);
+                                }
+                            }
+                        } else {
+                            possibleFuncs.push_back(callee_func);
+                        }
 
-                            // only insert pointer arguments in vector
-                            if (callOp->getType()->isPointerTy()) {
+                        for (Function *callee : possibleFuncs) {
+                            std::vector<Value*> callArgs;
+                            std::vector<Value*> funcArgs;
 
-                                funcArgs.push_back(funcOp);
-                                callArgs.push_back(callOp);
+                            // go over all call instruction arguments and function arguments
+                            for (int i=0; i<base->getNumArgOperands(); i++) {
+
+                                // get corresponding call args and function args
+                                Value *funcOp = callee->getArg(i);
+                                Value *callOp = base->getArgOperand(i);
+
+                                // only insert pointer arguments in vector
+                                if (callOp->getType()->isPointerTy()) {
+
+                                    funcArgs.push_back(funcOp);
+                                    callArgs.push_back(callOp);
+
+                                }
+                            }
+
+                            // add edges from function arg to children of call arg; similar to a = b, where a is the function arg and b is the passed arg
+
+                            for (int i=0; i<funcArgs.size(); i++){
+
+                                Node *src = points_to_graph.getPtrNode(callArgs[i]);
+                                Node *dst = points_to_graph.getPtrNode(funcArgs[i]);
+
+                                unsigned bef = dst->children.size();
+                                for(auto child : src->children)
+                                    points_to_graph.addEdge(dst, child);
+
+                                unsigned af = dst->children.size();
+
+                                changed = bef != af || changed;
+                            }
+
+                            // we only deal with return instructions that return a pointer. We do this for callee
+                            for (auto ret : rets[callee]) {
+
+                                // this is equivalent to a = retval; This is a special case for simple constraint. we add edges from a to children of retval;
+                                Node* retNode = points_to_graph.getPtrNode(ret->getOperand(0));
+                                Node* callNode = points_to_graph.getPtrNode(call);
+
+                                unsigned bef = callNode->children.size();
+                                for (auto child: retNode->children)
+                                    points_to_graph.addEdge(callNode, child);
+
+                                unsigned af = callNode->children.size();
+                                changed = bef != af || changed;
 
                             }
-                        }
-
-                        // add edges from function arg to children of call arg; similar to a = b, where a is the function arg and b is the passed arg
-
-                        for (int i=0; i<funcArgs.size(); i++){
-
-                            Node *src = points_to_graph.getPtrNode(callArgs[i]);
-                            Node *dst = points_to_graph.getPtrNode(funcArgs[i]);
-
-                            unsigned bef = dst->children.size();
-                            for(auto child : src->children)
-                                points_to_graph.addEdge(dst, child);
-
-                            unsigned af = dst->children.size();
-
-                            changed = bef != af || changed;
-                        }
-
-                        // we only deal with return instructions that return a pointer. We do this for callee
-                        for (auto ret : rets[callee]) {
-
-                            // this is equivalent to a = retval; This is a special case for simple constraint. we add edges from a to children of retval;
-                            Node* retNode = points_to_graph.getPtrNode(ret->getOperand(0));
-                            Node* callNode = points_to_graph.getPtrNode(call);
-
-                            unsigned bef = callNode->children.size();
-                            for (auto child: retNode->children)
-                                points_to_graph.addEdge(callNode, child);
-
-                            unsigned af = callNode->children.size();
-                            changed = bef != af || changed;
-
                         }
                     }
                 }

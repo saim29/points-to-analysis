@@ -84,6 +84,12 @@ namespace llvm {
                     case Instruction::Call: {
                         Function *callee = dyn_cast<CallBase>(&I)->getCalledFunction();
 
+                        // insert ptr calls in a special list
+                        if (callee == NULL) {
+                            functionCalls[&F].insert(&I);
+                            break;
+                        }
+                        
                         // we only deal with user-defined functions
                         // Technically speaking, we shouldn't trust any library functions that take pointers as arguments but we let that slide for out implementation
                         if (callee->size() == 0)

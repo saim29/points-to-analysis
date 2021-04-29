@@ -12,6 +12,7 @@ results: andersen tests
 	@echo "Running Passes ..."
 	make llvm_alias_res -C tests
 	make custom_alias_res -C tests
+	make custom_inter_alias_res -C tests
 
 clean:
 	make clean -C bld

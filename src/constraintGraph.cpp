@@ -67,13 +67,10 @@ namespace llvm {
         Node *ptr_node = NULL;
         Node *obj_node = NULL;
 
-        if (!isa<Function>(ref)) {
-
-            // create a pointer object in our ptr graph
-            ptr_node = new Node(ref, PTR);
-            ptr.insert({ref, ptr_node});
+        // create a pointer object in our ptr graph
+        ptr_node = new Node(ref, PTR);
+        ptr.insert({ref, ptr_node});
         
-        }
 
         // we only need to create a corresponding memory object for allocaInst, functions and global variables
         if (isa<AllocaInst>(ref) || isa<GlobalObject>(ref)) {
