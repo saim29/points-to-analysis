@@ -37,10 +37,13 @@ An implementation of andersen's pointer analysis in LLVM 11.
 - `src` - Source code for the constraint collector that reads the `.bc` file for the constraints required for the analysis, the graph generation code, and the analysis code. 
 - `tests` - Some code to test different aspects of our implementation. Tests range from basic pointers to arrays and even function pointers. Running `make` (please see below for exact syntax) here builds the specific test code. Please add custom tests to this directory. 
 
-## To build and run:
+## To build the pass:
 
-- `cd` to `bld` and run `make`
+- run `make andersen` in the root dir
     - Generates `andersen.so`
+ 
+## To build and run a test:
+
 - `cd` to `tests`
 - Example test file: `basic.c`
     - Possible `make` commands
@@ -49,7 +52,10 @@ An implementation of andersen's pointer analysis in LLVM 11.
         - `make basic.custom.res` - Performs our custom andersen's pass (intra-procedural only) and stores output to `basic.custom.res`
         - `make basic.custom.inter.res` - Performs our **complete** custom andersen's pass (with inter-procedural support) and stores output to `basic.custom.inter.res`
 
+## To build and run all tests:
 
+- run `make results` from the root dir
+    - generates `.llvm.res`, `.custom.res` and `custom.inter.res` for all benchmarks in the `tests` folder
 
 ## Example output 
 
